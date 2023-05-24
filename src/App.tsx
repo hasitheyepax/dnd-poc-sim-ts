@@ -1,11 +1,14 @@
 import './App.css';
 import DraggableComponentList from './components/DraggableComponentList';
 import { data } from './util/data';
+import { DragDropContext } from 'react-beautiful-dnd';
 
 function App() {
   return (
     <div className="App">
-      <DraggableComponentList listName="main" data={data} />
+      <DragDropContext onDragEnd={() => null}>
+        <DraggableComponentList listName="main" data={data} dataPath={''} />
+      </DragDropContext>
     </div>
   );
 }
