@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-
+import React from 'react';
+import { DragDropContext, Droppable, Draggable, DropResult, DragStart } from 'react-beautiful-dnd';
+import './DragDropComponent.css';
+import { log } from 'console';
 
 
 interface Item {
@@ -97,8 +99,14 @@ const DragDropComponent: React.FC = () => {
       ],
     },
   ]);
+  const [ActiveDepthLevel, setActiveDepthLevel] = useState<number>(0);
 
-
+  const onBeforeDragStart = (dragStart: DragStart) => {
+    const newItems = [...(items || [])];
+    const item = getItemById(newItems, dragStart.draggableId);
+    console.log('drag',dragStart, item);
+    setActiveDepthLevel(item?.depth ?? 0);
+  };
 
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return; // Return if dropped outside a droppable area
@@ -130,7 +138,7 @@ const DragDropComponent: React.FC = () => {
     }
 
 
-
+    setActiveDepthLevel(0);
     setItems(newItems);
   };
 
@@ -157,62 +165,74 @@ const DragDropComponent: React.FC = () => {
   };
 
 
-  const renderList = (items: Item[] | null | undefined ): JSX.Element[] => {
+  const renderList = (items: Item[] | null | undefined): JSX.Element[] => {
     if (items) {
       return items.map((item, index) => {
         const style = {
           paddingLeft: `${item.depth * 5}rem`,
-          fontSize: `${24 + (3 - item.depth ) * 6}px`,
-          textAlign: 'left' as const
+          fontSize: `${24 + (3 - item.depth) * 6}px`,
+          textAlign: 'left' as const,
+          backgroundColor: ActiveDepthLevel === item.depth ? 'rgba(20,45,67,30)':`rgba(0, 0, 0, ${(item.depth / 10)})`, // Rectangle color based on depth level
         };
+        console.log('rendering');
 
         return (
-          <Draggable key={item.id} draggableId={item.id} index={index}>
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-              >
-                <div style={style}>{item.name}</div>
-                {item.children && (
-                  <Droppable droppableId={item.id}>
-                    {(provided) => (
-                      <div ref={provided.innerRef} {...provided.droppableProps}>
-                        {renderList(item.children)}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                )}
-              </div>
-            )}
-          </Draggable>
-        );
+          <>
+            <Draggable key={item.id} draggableId={item.id} isDragDisabled={ActiveDepthLevel === item.depth} index={index}>
+              {(provided) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                >
+                  <div style={style} className="rectangle">
+                    <div className="drag-handle" {...provided.dragHandleProps}>
+                      {/* Drag handle icon */}
+                    </div>
+                    <div>{item.name} {index}</div>
+                    {item.children &&
+                      <Droppable droppableId={item.id} isDropDisabled={(ActiveDepthLevel -1) !== item.depth }>
+                        {(provided) => (
+                          <div ref={provided.innerRef} {...provided.droppableProps}>
+                            {renderList(item.children)}
+                            {provided.placeholder}
+                          </div>
+                        )}
+                      </Droppable>
+                    }
+                  </div>
+                </div>
+              )}
+            </Draggable>
+          </>
+        )
       });
     }
     return [];
   };
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DragDropContext onDragEnd={handleDragEnd} onBeforeDragStart={onBeforeDragStart} >
       <Droppable droppableId="root" mode="virtual" renderClone={(provided, snapshot, rubric) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          {...provided.dragHandleProps}
         >
-          <div>{items && items[rubric.source.index].name}</div>
-          {items && items[rubric.source.index].children && (
-            <Droppable droppableId={items[rubric.source.index].id}>
-              {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
-                  {renderList(items[rubric.source.index].children)}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          )}
+          <div className="rectangle">
+            <div className="drag-handle" {...provided.dragHandleProps}>
+              {/* Drag handle icon */}
+            </div>
+            <div>{items && items[rubric.source.index].name}</div>
+            {items && items[rubric.source.index].children && (
+              <Droppable droppableId={items[rubric.source.index].id}>
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {renderList(items[rubric.source.index].children)}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            )}
+          </div>
         </div>
       )}>
         {(provided) => (

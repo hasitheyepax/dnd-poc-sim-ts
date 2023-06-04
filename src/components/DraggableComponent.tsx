@@ -2,43 +2,48 @@ import React from 'react';
 import './DraggableComponent.css';
 import { NestedDraggableType } from '../util/types';
 import DraggableComponentList from './DraggableComponentList';
-import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
+import { DraggableProvidedDragHandleProps, Droppable } from 'react-beautiful-dnd';
 
 interface DraggableComponentProps {
   data: NestedDraggableType;
-  dataPath?: string;
-  index: number;
+  dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+  ActiveDepthLevel: number;
 }
 
 const DraggableComponent: React.FC<DraggableComponentProps> = (props) => {
   return (
     <>
-      <Draggable key={props.index} index={props.index} draggableId={`component_${props.index}`}>
-        {(provided: DraggableProvided) => (
-          <div ref={provided.innerRef} {...provided.draggableProps}>
-            {props.data.children.length > 0 ? (
-              <DraggableComponentList
-                data={props.data.children}
-                listName={props.data.component.name}
-                dataPath={props.dataPath + '.children'}
-              />
-            ) : (
-              <div className="container">
-                <div
-                  {...provided.dragHandleProps}
-                  style={{
-                    height: 24,
-                    width: 24,
-                    borderRadius: 12,
-                    backgroundColor: 'red',
-                  }}
+      <div className='row'>
+        <div className='dragHandle'>
+          <div
+            {...props.dragHandleProps}
+            style={{
+              height: 24,
+              width: 24,
+              borderRadius: 12,
+              marginRight: 12,
+              backgroundColor: 'red',
+            }}
+          />
+          <span>{`${props.data.component.name}`}</span>
+        </div>
+      </div>
+      {(
+        <div className='row itemList'>
+          <Droppable droppableId={props.data.component.id} isDropDisabled={(props.ActiveDepthLevel - 1) !== props.data.component.depth}>
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+
+                <DraggableComponentList
+                  data={props.data.children}
+                  ActiveDepthLevel={props.ActiveDepthLevel}
                 />
-                <span>{`${props.data.component.name}`}</span>
+                {provided.placeholder}
               </div>
             )}
-          </div>
-        )}
-      </Draggable>
+          </Droppable>
+        </div>
+      )}
     </>
   );
 };

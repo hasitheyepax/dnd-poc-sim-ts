@@ -1,11 +1,14 @@
-.container {
+.dragHandle {
   display: flex;
-  height: 50px;
-  background-color: goldenrod;
-  width: 250px;
   justify-content: center;
+}
+
+.row {
+  display: flex;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 10px;
-  border-radius: 10px;
+  min-height: 1.5rem;
+  margin: 10px;
+}
+.row > * {
+  flex: 1;
 }
