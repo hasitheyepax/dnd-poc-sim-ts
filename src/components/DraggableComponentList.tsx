@@ -1,50 +1,35 @@
-import { DragDropContext, Droppable, DroppableProvided, OnDragEndResponder } from 'react-beautiful-dnd';
+import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import { NestedDraggableType } from '../util/types';
 import DraggableComponent from './DraggableComponent';
 import './DraggableComponentList.css';
-import uuid from 'react-uuid';
 
 interface DraggableComponentListProps {
-  listName?: string;
   data: NestedDraggableType[];
-  droppableProvided?: DroppableProvided;
-  dataPath?: string;
+  ActiveDepthLevel: number;
 }
 
 const DraggableComponentList: React.FC<DraggableComponentListProps> = (props) => {
-  const onDragEnd: OnDragEndResponder = (result) => {
-    const { source, destination } = result;
-
-    if (!destination) return;
-
-    let temp: NestedDraggableType;
-    temp = props.data[destination.index];
-    props.data[destination.index] = props.data[source.index];
-    props.data[source.index] = temp;
-  };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId={'components-' + props.dataPath}>
-        {(provided: DroppableProvided) => (
-          <div ref={provided.innerRef} {...provided.droppableProps} style={{ flexGrow: 1 }}>
-            <div className="list">
-              <div>{props.listName}</div>
-              <br />
-              {props.data.map((component, index) => (
+    <>
+      {props.data.map((component, index) => (
+        <Draggable key={component.component.id} index={index} draggableId={component.component.id}>
+          {(provided: DraggableProvided) => (
+            <div ref={provided.innerRef} {...provided.draggableProps}>
+
+              <div className="list" style={{ backgroundColor: `rgba(0, 0, 0, ${(component.component.depth / 10)})` }}>
                 <DraggableComponent
-                  key={uuid()}
                   data={component}
-                  dataPath={props.dataPath + '[' + index + ']'}
-                  index={index}
+                  ActiveDepthLevel={props.ActiveDepthLevel}
+                  dragHandleProps={provided.dragHandleProps}
                 />
-              ))}
+              </div>
+
             </div>
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+          )}
+        </Draggable>
+      ))}
+    </>
   );
 };
 

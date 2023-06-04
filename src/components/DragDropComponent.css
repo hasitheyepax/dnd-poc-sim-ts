@@ -1,0 +1,17 @@
+.rectangle {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    left: 0;
+    /* Add additional styling properties as needed */
+  }
+  
+  .drag-handle {
+    width: 20px;
+    height: 20px;
+    background-color: #ccc;
+    margin-right: 10px;
+    /* Add additional styling properties as needed */
+  }
