@@ -25,12 +25,14 @@ export const data: NestedDraggableType[] = [
         component: {
           id: 'ath-3',
           name: 'Cycling',
+          type: 'logic_bloc',
         },
         children: [
           {
             component: {
               id: 'c-1',
               name: 'Cycling Categories',
+              type: 'if',
             },
             children: [
               {
@@ -46,6 +48,7 @@ export const data: NestedDraggableType[] = [
             component: {
               id: 'moto',
               name: 'Moto GP',
+              type: 'else',
             },
             children: [
               {

@@ -21,6 +21,7 @@ const DraggableComponent: React.FC<DraggableComponentProps> = (props) => {
                 data={props.data.children}
                 listName={props.data.component.name}
                 dataPath={props.dataPath + '.children'}
+                fromParent={props.data}
               />
             ) : (
               <div className="container">

@@ -9,10 +9,12 @@ interface DraggableComponentListProps {
   data: NestedDraggableType[];
   droppableProvided?: DroppableProvided;
   dataPath?: string;
+  fromParent?: NestedDraggableType;
 }
 
 const DraggableComponentList: React.FC<DraggableComponentListProps> = (props) => {
   const onDragEnd: OnDragEndResponder = (result) => {
+    console.log(result);
     const { source, destination } = result;
 
     if (!destination) return;
@@ -22,6 +24,8 @@ const DraggableComponentList: React.FC<DraggableComponentListProps> = (props) =>
     props.data[destination.index] = props.data[source.index];
     props.data[source.index] = temp;
   };
+
+  console.log(props.fromParent);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
